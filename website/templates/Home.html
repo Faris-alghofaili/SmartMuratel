@@ -11,30 +11,30 @@
             .project-card {
                 position: relative; /* Required for absolute positioning inside the card */
             }
-    
+
             .project-card .delete-btn {
-                position: absolute; /* Enables placement relative to the card */
-                top: 10px; /* Distance from the top of the card */
-                right: 10px; /* Distance from the right of the card */
-                background: none; /* Removes default button background */
-                border: none; /* Removes border */
-                color: white; /* Matches the card's theme */
-                font-size: 20px; /* Larger size for better visibility */
-                cursor: pointer; /* Makes it clickable */
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 20px;
+                cursor: pointer;
             }
-    
+
             .project-card .delete-btn:hover {
-                color: red; /* Optional: Add hover effect for better UX */
+                color: red;
             }
         </style>
     </head>
     <body>
         <div class="header">
-        <img src="{{ url_for('static', filename='images/logoo.png') }}" alt="Logo">
+            <img src="{{ url_for('static', filename='images/logoo.png') }}" alt="Logo">
         </div>
         <main>
-        <a href="templates/How_it_works.html">How it works</a>
-        <a href="templates/About_us.html">About us</a>
+            <a href="templates/How_it_works.html">How it works</a>
+            <a href="templates/About_us.html">About us</a>
         </main>
     
         <section class="projects-section">
@@ -42,38 +42,56 @@
                 <h2>My Projects</h2>
                 <button id="addProjectBtn">Add new project</button>
             </div>
-            <div id="projectsGrid" class="projects-grid"></div>
+    
+            <div id="projectsGrid" class="projects-grid">
+                {% for project in project_data %}
+                    <div class="project-card"
+                        data-id="{{ project.Project_id }}"
+                        data-version-name="{{ project.quranversion.name }}">
+                        <!-- ✅ Pass the correct data-id -->
+                        <button class="delete-btn" data-id="{{ project.Project_id }}">&times;</button>
+                        <p class="project-title">{{ project.name }}</p>
+                        <p class="project-lang">Language: {{ project.language }}</p>
+                        <button class="project-btn">Next</button>
+                    </div>
+                {% endfor %}
+            </div>                   
         </section>
     
-        <!-- Modal Popup -->
+        <!-- ✅ Modal Popup for adding projects -->
         <div id="projectModal" class="modal">
             <div class="modal-content">
                 <span id="closeModal" class="close">&times;</span>
                 <img src="{{ url_for('static', filename='images/logoo.png') }}" alt="Logo" class="modal-logo">
                 <form id="projectForm">
                     <input type="text" id="projectName" placeholder="Project Name" required>
+
+                    <!-- ✅ Quran Versions populated dynamically -->
                     <select id="translatedVersion" required>
-                        <option value="" disabled selected>Translated version</option>
-                        <option value="Option 1">Option 1</option>
-                        <option value="Option 2">Option 2</option>
+                        <option value="" disabled selected>Select Translated Version</option>
+                        {% for version in quranversions %}
+                            <option value="{{ version.name }}">{{ version.name }}</option> <!-- ✅ Use name instead of id -->
+                        {% endfor %}
                     </select>
+
                     <select id="language" required>
-                        <option value="" disabled selected>Language</option>
+                        <option value="" disabled selected>Select Language</option>
                         <option value="English">English</option>
                         <option value="Arabic">Arabic</option>
                     </select>
-                    
                     <button type="submit">Next</button>
                 </form>
             </div>
         </div>
+    
+        <!-- ✅ Modal for deletion confirmation -->
         <div id="deleteModal" class="delete-modal">
-            <div class="delete-modal-content">
-                <p id="deleteMessage"></p>
-                <button id="confirmDelete" class="confirm-btn">Yes</button>
-                <button id="cancelDelete" class="cancel-btn">No</button>
+            <div class="modal-content">
+                <span id="closeDeleteModal" class="close">&times;</span>
+                <p>Are you sure you want to delete this project?</p>
+                <button id="confirmDelete">Yes</button>
+                <button id="cancelDelete">No</button>
             </div>
         </div>
     </body>
-    
 </html>
