@@ -21,22 +21,31 @@ class User(db.Model,UserMixin):
         return str(self.User_id)
 
     def __repr__(self):
-        return f"<User {self.Username}>"
+        return f"<User {self.User_id}>"
 
-class Projects(db.Model):
-    __tablename__ = 'projects'
-    Project_id = db.Column(db.Integer,primary_key = True)
-    name = db.Column(db.String(50),unique = True,nullable = False)
-    id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    version_id = db.Column(db.Integer, db.ForeignKey('quranversions.Version_id'))
-    voice_id = db.Column(db.Integer, db.ForeignKey("voices.voice_id"))
+
+class Project(db.Model):
+    __tablename__ = 'Projects'
+    
+    Project_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    User_id = db.Column(db.Integer, db.ForeignKey('user.User_id'), nullable=False)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    voice_id = db.Column(db.Integer, db.ForeignKey('voices.voice_id'))
+    quranversions_Version_id = db.Column(db.Integer, db.ForeignKey('quranversions.Version_id'), nullable=False)
+
+    # ✅ Correct relationship
+    quranversion = db.relationship('Quranversions', backref='projects')
+    user = db.relationship('User', backref='projects')
+
+    
+
 
 
 class Quranversions(db.Model):
     __tablename__ = 'quranversions'
     Version_id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(255), unique = True, nullable = False)
-    langaue = db.Column(db.String(50), nullable = False)
+    language = db.Column(db.String(50), nullable = False)
     created_at = db.Column(db.Date, nullable=False, default=func.now())
 
 class Voices(db.Model):
