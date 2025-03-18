@@ -21,7 +21,7 @@ def create_app():
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
-    from .modules import User, Projects, Quranversions, Voices
+    from .modules import User, Project, Quranversions, Voices
     
     # ✅ Initialize Flask-Login
     login_manager = LoginManager()
