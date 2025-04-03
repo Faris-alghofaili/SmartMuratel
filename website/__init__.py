@@ -9,7 +9,7 @@ def create_app():
     
     # ✅ Set Secret Key and Database Configuration
     app.config['SECRET_KEY'] = 'bqidfbiwfwiucwuicbwiiwnfw'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:Ziyad12@localhost/mydb'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:@localhost/mydb'
     
     db.init_app(app)
     

@@ -51,8 +51,11 @@
                         <!-- ✅ Pass the correct data-id -->
                         <button class="delete-btn" data-id="{{ project.Project_id }}">&times;</button>
                         <p class="project-title">{{ project.name }}</p>
-                        <p class="project-lang">Language: {{ project.language }}</p>
-                        <button class="project-btn">Next</button>
+                        <p class="project-lang">Language: {{ project.quranversion.language }}</p>
+                        <button class="project-btn" 
+                        onclick="window.location.href='{{ url_for('views.project_details', project_id=project.Project_id) }}'">
+                    Next
+                </button>
                     </div>
                 {% endfor %}
             </div>                   
@@ -70,7 +73,7 @@
                     <select id="translatedVersion" required>
                         <option value="" disabled selected>Select Translated Version</option>
                         {% for version in quranversions %}
-                            <option value="{{ version.name }}">{{ version.name }}</option> <!-- ✅ Use name instead of id -->
+                            <option value="{{ version.name }}">{{ version.name }},{{ version.language }}</option> <!-- ✅ Use name instead of id -->
                         {% endfor %}
                     </select>
 

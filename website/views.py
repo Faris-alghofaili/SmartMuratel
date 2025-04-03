@@ -1,6 +1,6 @@
-from flask import Blueprint,render_template,request,jsonify
+from flask import Blueprint, abort,render_template,request,jsonify
 from flask_login import login_required,  current_user, LoginManager
-from .modules import db, Project, Quranversions
+from .modules import *
 
 views = Blueprint('views',__name__)
 
@@ -79,7 +79,69 @@ def delete_project(project_id):
     
     return jsonify({"message": "Project deleted successfully"}), 200
 
-
+@views.route('/project/<int:project_id>', methods=['GET'])
+@login_required
+def project_details(project_id):
+    project = Project.query.get(project_id)
+    # Verify the project belongs to the current user
+    if project.User_id != current_user.User_id:
+        abort(403)
     
+    voices = Voices.query.all()
     
+    return render_template('Main.html', 
+                        project=project,
+                        voices=voices)
 
+@views.route('/assign_voice/<int:project_id>', methods=['POST'])
+@login_required
+def assign_voice(project_id):
+    project = Project.query.get_or_404(project_id)
+    
+    # Verify ownership
+    if project.User_id != current_user.User_id:
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    voice_id = request.json.get('voice_id')
+    
+    if not voice_id:
+        # Remove voice association if empty selection
+        project.voice_id = None
+        db.session.commit()
+        return jsonify({'message': 'Voice removed', 'voice_name': ''})
+    
+    voice = Voices.query.get(voice_id)
+    if not voice:
+        return jsonify({'error': 'Voice not found'}), 404
+    
+    # Assign the voice
+    project.voice_id = voice_id
+    db.session.commit()
+    
+    return jsonify({
+        'message': 'Voice assigned successfully',
+        'voice_name': voice.name
+    })
+@views.route('/get_surahs')
+@login_required
+def get_surahs():
+    surahs = Surahs.query.order_by(Surahs.surah_number).all()
+    return jsonify([{
+        'id': s.sutrah_id,
+        'number': s.surah_number,
+        'name': s.name,
+        'arabic_name': s.arabic_name,
+        'ayah_count': s.number_of_ayahs
+    } for s in surahs])
+
+@views.route('/get_verses/<int:surah_id>')
+@login_required
+def get_verses(surah_id):
+    verses = Verses.query.filter_by(Surahs_sutrah_id=surah_id)\
+                    .order_by(Verses.verse_number)\
+                    .all()
+    return jsonify([{
+        'id': v.verse_id,
+        'number': v.verse_number,
+        'text': v.text
+    } for v in verses])

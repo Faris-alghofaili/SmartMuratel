@@ -22,7 +22,7 @@ def sign_up():
             if not name or not username or not email or not password or not confirm_password:
                 return jsonify({"message": "All fields are required!"}), 400
             if User.query.filter_by(email = email).first():
-                 return jsonify({"message": "Email is already exits"}),400 
+                return jsonify({"message": "Email is already exits"}),400 
             if  User.query.filter_by(Username = username).first():
                 return jsonify({"message": "Username is already exits"}),400 
             
@@ -36,7 +36,7 @@ def sign_up():
                 first_name = name,
                 Username = username,
                 email = email,
-                password_hash = password,
+                password_hash = generate_password_hash(password,method='sha256')  ,
                 is_admin = False
             )
             db.session.add(new_user)
@@ -68,7 +68,7 @@ def sign_in():
             # Example authentication check (replace with real logic)
             user = User.query.filter_by(email = email).first()
             if user:
-                if  password == user.password_hash:
+                if check_password_hash(user.password_hash,password):
                         login_user(user, remember = True)
                         return jsonify({"message": "Login successful!", "redirect": url_for('views.home')}), 200
             else:
