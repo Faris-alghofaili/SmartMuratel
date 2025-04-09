@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Projects` (
   CONSTRAINT `fk_Projects_quranversions1`
     FOREIGN KEY (`quranversions_Version_id`)
     REFERENCES `mydb`.`quranversions` (`Version_id`)
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
