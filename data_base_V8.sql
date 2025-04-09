@@ -77,7 +77,6 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Projects` (
   UNIQUE INDEX `Project_id_UNIQUE` (`Project_id` ASC) VISIBLE,
   INDEX `fk_Projects_user1_idx` (`User_id` ASC) VISIBLE,
   INDEX `fk_Projects_voices1_idx` (`voice_id` ASC) VISIBLE,
-  INDEX `fk_Projects_quranversions1_idx` (`quranversions_Version_id` ASC) VISIBLE,
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE,
   CONSTRAINT `fk_Projects_user1`
     FOREIGN KEY (`User_id`)
@@ -90,8 +89,8 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Projects` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Projects_quranversions1`
-    FOREIGN KEY (`quranversions_Version_id`)
-    REFERENCES `mydb`.`quranversions` (`Version_id`)
+    FOREIGN KEY ()
+    REFERENCES `mydb`.`quranversions` ()
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -216,3 +215,11 @@ DEFAULT CHARACTER SET = utf8mb3;
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+USE `mydb`;
+
+DELIMITER $$
+USE `mydb`$$
+DELETE FROM `quranversions` WHERE Version_id = OLD.quranversions_Version_id;$$
+
+
+DELIMITER ;
