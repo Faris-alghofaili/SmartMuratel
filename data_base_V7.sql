@@ -133,12 +133,13 @@ CREATE TABLE IF NOT EXISTS `mydb`.`surahs` (
   `arabic_name` VARCHAR(255) NOT NULL,
   `number_of_ayahs` INT NOT NULL,
   `QuranVersions_Version_id` INT NOT NULL,
-  PRIMARY KEY (`sutrah_id`, `QuranVersions_Version_id`),
+  PRIMARY KEY (`sutrah_id`),
   UNIQUE INDEX `sutrah_id_UNIQUE` (`sutrah_id` ASC) VISIBLE,
   INDEX `fk_Surahs_QuranVersions1_idx` (`QuranVersions_Version_id` ASC) VISIBLE,
   CONSTRAINT `fk_Surahs_QuranVersions1`
     FOREIGN KEY (`QuranVersions_Version_id`)
-    REFERENCES `mydb`.`quranversions` (`Version_id`))
+    REFERENCES `mydb`.`quranversions` (`Version_id`)
+    ON DELETE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
@@ -171,7 +172,8 @@ CREATE TABLE IF NOT EXISTS `mydb`.`verses` (
   INDEX `fk_verses_Surahs1_idx` (`Surahs_sutrah_id` ASC) VISIBLE,
   CONSTRAINT `fk_verses_Surahs1`
     FOREIGN KEY (`Surahs_sutrah_id`)
-    REFERENCES `mydb`.`surahs` (`sutrah_id`))
+    REFERENCES `mydb`.`surahs` (`sutrah_id`)
+    ON DELETE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
@@ -195,16 +197,17 @@ CREATE TABLE IF NOT EXISTS `mydb`.`versetags` (
   INDEX `fk_versetags_Projects1_idx` (`Projects_Project_id` ASC, `Projects_User_id` ASC) VISIBLE,
   CONSTRAINT `fk_verseTags_verses1`
     FOREIGN KEY (`verses_verse_id`)
-    REFERENCES `mydb`.`verses` (`verse_id`),
+    REFERENCES `mydb`.`verses` (`verse_id`)
+    ON DELETE CASCADE,
   CONSTRAINT `fk_versetags_tag1`
     FOREIGN KEY (`tag_tag_id`)
     REFERENCES `mydb`.`tag` (`tag_id`)
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_versetags_Projects1`
     FOREIGN KEY (`Projects_Project_id` , `Projects_User_id`)
     REFERENCES `mydb`.`Projects` (`Project_id` , `User_id`)
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
