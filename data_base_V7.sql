@@ -59,8 +59,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`quranversions` (
   `description` TINYTEXT NULL DEFAULT NULL,
   `created_at` DATE NOT NULL,
   PRIMARY KEY (`Version_id`),
-  UNIQUE INDEX `Version_id_UNIQUE` (`Version_id` ASC) VISIBLE,
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE)
+  UNIQUE INDEX `Version_id_UNIQUE` (`Version_id` ASC) VISIBLE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb3;
 
@@ -72,14 +71,14 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Projects` (
   `Project_id` INT NOT NULL AUTO_INCREMENT,
   `User_id` INT NOT NULL,
   `name` VARCHAR(50) NOT NULL,
-  `voice_id` INT NOT NULL,
+  `voice_id` INT NULL,
   `quranversions_Version_id` INT NOT NULL,
   PRIMARY KEY (`Project_id`, `User_id`),
   UNIQUE INDEX `Project_id_UNIQUE` (`Project_id` ASC) VISIBLE,
   INDEX `fk_Projects_user1_idx` (`User_id` ASC) VISIBLE,
-  UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE,
   INDEX `fk_Projects_voices1_idx` (`voice_id` ASC) VISIBLE,
   INDEX `fk_Projects_quranversions1_idx` (`quranversions_Version_id` ASC) VISIBLE,
+  UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE,
   CONSTRAINT `fk_Projects_user1`
     FOREIGN KEY (`User_id`)
     REFERENCES `mydb`.`user` (`User_id`)
@@ -166,6 +165,7 @@ CREATE TABLE IF NOT EXISTS `mydb`.`verses` (
   `verse_number` INT NOT NULL,
   `text` MEDIUMTEXT NOT NULL,
   `Surahs_sutrah_id` INT NOT NULL,
+  `is_altered` BINARY(1) NULL,
   PRIMARY KEY (`verse_id`, `Surahs_sutrah_id`),
   UNIQUE INDEX `verse_id_UNIQUE` (`verse_id` ASC) VISIBLE,
   INDEX `fk_verses_Surahs1_idx` (`Surahs_sutrah_id` ASC) VISIBLE,

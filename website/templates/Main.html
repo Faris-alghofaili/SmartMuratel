@@ -3,29 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project: {{ project_name }}</title>
+    <title>Project: {{ project.name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/Main.css') }}">
-    <script defer src="{{ url_for('static', filename='js/Main.js') }}"></script>
 </head>
 <body>
     <div class="header">
         <img src="{{ url_for('static', filename='images/logoo.png') }}" alt="Logo">
     </div>
     <main>
-        <a href="templates/How_it_works.html">How it works</a>
-        <a href="templates/About_us.html">About us</a>
+        <a href="{{ url_for('views.how_it_works') }}">How it works</a>
+        <a href="{{ url_for('views.about_us') }}">About us</a>
     </main>
     
     <div class="cloned-voice-section">
-        <select id="cloned-voice" class="custom-select" 
-                data-project-id="{{ project.Project_id }}"
-                style="... your existing styles ...">
-            <option value="" {% if not project.voice_id %}selected{% endif %}>
-                Select Cloned Voice
-            </option>
+        <select id="cloned-voice" class="custom-select" data-project-id="{{ project.Project_id }}">
+            <option value="" {% if not project.voice_id %}selected{% endif %}>Select Cloned Voice</option>
             {% for voice in voices %}
-                <option value="{{ voice.voice_id }}"
-                        {% if project.voice_id == voice.voice_id %}selected{% endif %}>
+                <option value="{{ voice.voice_id }}" {% if project.voice_id == voice.voice_id %}selected{% endif %}>
                     {{ voice.name }}
                 </option>
             {% endfor %}
@@ -47,30 +41,124 @@
                     <button class="emotion-btn">Alif-lam-mem</button>
                     <button class="emotion-btn">Questions</button>
                     <button class="emotion-btn">Allah#2</button>
-                </div><div class="icons">
+                </div>
+                <div class="icons">
                     <span class="play-icon" onclick="handleClick('play')">▶</span>
                     <span class="pause-icon" onclick="handleClick('pause')">⏸</span>
                     <span class="save-icon" onclick="handleClick('save')">💾</span>
                     <span class="export-text" onclick="handleClick('export')">Export</span>
                 </div>
-                
             </div>
             <textarea id="text-box" style="font-size: 24px; padding: 10px; width: 100%; height: 250px; border-radius: 10px;"></textarea>
         </div>
-        <div class="right-grid" style="width: 50%; min-height: 500px; max-height: 500px; overflow-y: auto; border: .5px solid black; background-color: #ffffff; border-radius: 15px; display: flex; flex-direction: column; align-items: center; text-align: center;">
+        
+        <div class="right-grid" style="width: 50%; min-height: 500px; max-height: 500px; overflow-y: auto; border: .5px solid black; background-color: #ffffff; border-radius: 15px; display: flex; flex-direction: column; align-items: center; padding: 15px;">
+            <div class="version-display" style="margin-bottom: 10px; padding: 8px; background: #f5f5f5; border-radius: 5px; width: 100%;">
+            </div>        
             <select id="sura-select" class="sura-select" style="background-image: url('select-icon.png'); background-repeat: no-repeat; background-position: right 10px center; background-size: 20px; width: 450px;">
                 <option disabled selected>Select Sura</option>
-
+                <option value="">Select a Surah</option>
+                {% for num in range(1, 115) %}
+                    <option value="{{ num }}">{{ num }}. {{ surah_names[num-1] }}</option>
+                {% endfor %}
             </select>
-            <div id="ayah-container" class="ayah-container" style="margin-top: 10px; width: 450px; display: none; text-align: center;"></div>
-            
+            <div id="ayah-container" class="ayah-container" style="display: none; width: 100%;"></div>
         </div>
     </div>
-        
-    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const textBox = document.getElementById("text-box");
+            const ayahContainer = document.getElementById("ayah-container");
             
-        </div>
-    </div>
-    
+            // Handle ayah selection
+            ayahContainer.addEventListener("click", function(e) {
+                const verseText = e.target.closest(".verse")?.querySelector(".verse-text");
+                if (verseText) {
+                    textBox.value = verseText.textContent;
+                }
+            });
+            
+            // Handle surah selection
+            document.getElementById('sura-select').addEventListener('change', function() {
+                const surahNumber = this.value;
+                const projectId = {{ project.Project_id | tojson | safe }};
+                
+                if (!surahNumber) {
+                    ayahContainer.style.display = 'none';
+                    return;
+                }
+                
+                ayahContainer.style.display = 'block';
+                ayahContainer.innerHTML = '<div class="loading-spinner">Loading Surah...</div>';
+                
+                fetch('/load_surah', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        project_id: projectId,
+                        surah_number: surahNumber
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => Promise.reject(err));
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    let html = `
+                        <div class="surah-header">
+                            <h3>${data.surah.number}. ${data.surah.name}</h3>
+                        </div>
+                    `;
+                    
+                    data.verses.forEach(verse => {
+                        html += `
+                            <div class="verse">
+                                <span class="verse-number">${verse.number}.</span>
+                                <span class="verse-text">${verse.text}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    ayahContainer.innerHTML = html;
+                })
+                .catch(error => {
+                    ayahContainer.innerHTML = `
+                        <div class="error-message">
+                            Error: ${error.message || 'Failed to load surah'}
+                        </div>
+                    `;
+                    console.error('Error:', error);
+                });
+            });
+            
+            // Handle button clicks
+            function handleClick(action) {
+                switch(action) {
+                    case 'play':
+                        // Implement play functionality
+                        break;
+                    case 'pause':
+                        // Implement pause functionality
+                        break;
+                    case 'save':
+                        // Implement save functionality
+                        break;
+                    case 'export':
+                        // Implement export functionality
+                        break;
+                    default:
+                        console.log('Unknown action');
+                }
+            }
+            
+            // Expose handleClick to global scope for onclick attributes
+            window.handleClick = handleClick;
+        });
+    </script>
 </body>
 </html>

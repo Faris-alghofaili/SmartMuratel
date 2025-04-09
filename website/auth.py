@@ -36,7 +36,7 @@ def sign_up():
                 first_name = name,
                 Username = username,
                 email = email,
-                password_hash = generate_password_hash(password,method='sha256')  ,
+                password_hash = generate_password_hash(password)  ,
                 is_admin = False
             )
             db.session.add(new_user)

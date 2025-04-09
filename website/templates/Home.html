@@ -33,8 +33,8 @@
             <img src="{{ url_for('static', filename='images/logoo.png') }}" alt="Logo">
         </div>
         <main>
-            <a href="templates/How_it_works.html">How it works</a>
-            <a href="templates/About_us.html">About us</a>
+            <a href="{{ url_for('views.how_it_works') }}">How it works</a>
+            <a href="{{ url_for('views.about_us') }}">About us</a>
         </main>
     
         <section class="projects-section">
