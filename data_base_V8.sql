@@ -78,10 +78,11 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Projects` (
   INDEX `fk_Projects_user1_idx` (`User_id` ASC) VISIBLE,
   INDEX `fk_Projects_voices1_idx` (`voice_id` ASC) VISIBLE,
   UNIQUE INDEX `name_UNIQUE` (`name` ASC) VISIBLE,
+  INDEX `fk_Projects_quranversions1_idx` (`quranversions_Version_id` ASC) VISIBLE,
   CONSTRAINT `fk_Projects_user1`
     FOREIGN KEY (`User_id`)
     REFERENCES `mydb`.`user` (`User_id`)
-    ON DELETE NO ACTION
+    ON DELETE CASCADE
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Projects_voices1`
     FOREIGN KEY (`voice_id`)
@@ -89,8 +90,8 @@ CREATE TABLE IF NOT EXISTS `mydb`.`Projects` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Projects_quranversions1`
-    FOREIGN KEY ()
-    REFERENCES `mydb`.`quranversions` ()
+    FOREIGN KEY (`quranversions_Version_id`)
+    REFERENCES `mydb`.`quranversions` (`Version_id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
